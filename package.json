@@ -1,0 +1,35 @@
+{
+  "name": "sayayines",
+  "version": "1.0.0",
+  "description": "El gimnasio de la evolución",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sebas404040/SAYAYINES.git"
+  },
+  "keywords": [
+    "gym",
+    "fitness",
+    "health"
+  ],
+  "author": "Sergio Lievano, Sebastián Gómez, Bryan Villabona",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sebas404040/SAYAYINES/issues"
+  },
+  "homepage": "https://github.com/Sebas404040/SAYAYINES#readme",
+  "dependencies": {
+    "boxen": "^8.0.1",
+    "cfonts": "^3.3.1",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5",
+    "dayjs": "^1.11.18",
+    "dotenv": "^17.2.2",
+    "inquirer": "^8.2.7",
+    "mongodb": "^6.20.0"
+  }
+}
