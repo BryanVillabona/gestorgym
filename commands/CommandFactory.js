@@ -20,6 +20,8 @@ import GestionarAvanceCommand from './GestionarAvance.Command.js';
 import CrearPlanNutricionalCommand from './CrearPlanNutricional.Command.js';
 import ConsultarPlanNutricionalCommand from './ConsultarPlanNutricional.Command.js';
 import GestionarPlanNutricionalCommand from './GestionarPlanNutricional.Command.js';
+import CrearEntrenadorCommand from './CrearEntrenador.Command.js';
+import ListarEntrenadoresCommand from './ListarEntrenadores.Command.js';
 
 // Patrón Factory para centralizar la creación de comandos
 export default class CommandFactory {
@@ -69,6 +71,10 @@ export default class CommandFactory {
         return new ConsultarPlanNutricionalCommand();
       case 'gestionarPlanNutricional':
         return new GestionarPlanNutricionalCommand();
+      case 'crearEntrenador':
+        return new CrearEntrenadorCommand();
+      case 'listarEntrenadores':
+        return new ListarEntrenadoresCommand();
       default:
         throw new Error(`Comando no encontrado: ${commandName}`);
     }

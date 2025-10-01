@@ -11,7 +11,8 @@ import {
   contratoSchema,
   seguimientoFisicoSchema,
   planNutricionalSchema,
-  transaccionFinancieraSchema
+  transaccionFinancieraSchema,
+  entrenadorSchema
 } from './models/schemas/schemas.js';
 import dayjs from 'dayjs';
 import dotenv from 'dotenv';
@@ -24,7 +25,8 @@ const coleccionesConEsquema = {
   contratos: contratoSchema,
   seguimiento_fisico: seguimientoFisicoSchema,
   planes_nutricionales: planNutricionalSchema,
-  transacciones_financieras: transaccionFinancieraSchema
+  transacciones_financieras: transaccionFinancieraSchema,
+  entrenadores: entrenadorSchema
 };
 
 async function aplicarValidaciones(db) {
@@ -49,7 +51,7 @@ async function aplicarValidaciones(db) {
 
 async function seedDatabase() {
   const HOY = dayjs("2025-09-26T10:00:00-05:00"); // Fecha fija para consistencia
-  
+
   try {
     console.log("Iniciando script de siembra con datos de prueba robustos...");
     const db = await database.realizarConexion();
@@ -79,6 +81,13 @@ async function seedDatabase() {
     const clientesIds = Object.values(clientesResult.insertedIds);
     console.log(`- ${clientesIds.length} Clientes insertados.`);
 
+    const entrenadoresResult = await db.collection('entrenadores').insertMany([
+      { nombre: 'Sergio Liévano' },
+      { nombre: 'Sebastián Gómez' },
+      { nombre: 'Bryan Villabona' }
+    ]);
+    console.log(`- ${Object.values(entrenadoresResult.insertedIds).length} Entrenadores insertados.`);
+
     // 2. Planes de Entrenamiento
     const planesData = [
       { nombre: 'Fuerza y Potencia', duracion_dias: 90, metas: 'Incrementar fuerza máxima', nivel: 'avanzado', precio_sugerido: 250000 },
@@ -91,7 +100,7 @@ async function seedDatabase() {
     const planesIds = Object.values(planesResult.insertedIds);
     planesData.forEach((plan, i) => plan._id = planesIds[i]);
     console.log(`- ${planesIds.length} Planes de entrenamiento insertados.`);
-    
+
     // 3. Contratos
     const contratosData = [
       // Activos
@@ -126,35 +135,35 @@ async function seedDatabase() {
     }));
     await db.collection('transacciones_financieras').insertMany(transaccionesIngresoContratos);
     console.log(`- ${transaccionesIngresoContratos.length} Transacciones de ingreso por contrato insertadas.`);
-    
+
     // 4. Seguimiento Físico
     const seguimientoData = [
-        { contratoId: contratosIds[0], fecha: HOY.subtract(13, 'days').toDate(), peso_kg: 85, grasa_corporal_porcentaje: 15.5, medidas: { pecho: 110, brazo: 39, cintura: 85, pierna: 60 }, fotos_urls: ["https://placehold.co/600x400"], comentarios: "Inicio del plan.", estado: "valido" },
-        { contratoId: contratosIds[0], fecha: HOY.subtract(6, 'days').toDate(), peso_kg: 84.5, grasa_corporal_porcentaje: 15.1, medidas: { pecho: 110.5, brazo: 39.5, cintura: 84, pierna: 60.5 }, fotos_urls: [], comentarios: "Buena adaptación.", estado: "valido" },
-        { contratoId: contratosIds[0], fecha: HOY.subtract(2, 'days').toDate(), peso_kg: 99, estado: "cancelado", fotos_urls: [] }, // Cancelado
-        { contratoId: contratosIds[1], fecha: HOY.subtract(3, 'days').toDate(), peso_kg: 62, grasa_corporal_porcentaje: 22, medidas: { cintura: 65 }, fotos_urls: [], comentarios: "Cliente motivada.", estado: "valido" }
+      { contratoId: contratosIds[0], fecha: HOY.subtract(13, 'days').toDate(), peso_kg: 85, grasa_corporal_porcentaje: 15.5, medidas: { pecho: 110, brazo: 39, cintura: 85, pierna: 60 }, fotos_urls: ["https://placehold.co/600x400"], comentarios: "Inicio del plan.", estado: "valido" },
+      { contratoId: contratosIds[0], fecha: HOY.subtract(6, 'days').toDate(), peso_kg: 84.5, grasa_corporal_porcentaje: 15.1, medidas: { pecho: 110.5, brazo: 39.5, cintura: 84, pierna: 60.5 }, fotos_urls: [], comentarios: "Buena adaptación.", estado: "valido" },
+      { contratoId: contratosIds[0], fecha: HOY.subtract(2, 'days').toDate(), peso_kg: 99, estado: "cancelado", fotos_urls: [] }, // Cancelado
+      { contratoId: contratosIds[1], fecha: HOY.subtract(3, 'days').toDate(), peso_kg: 62, grasa_corporal_porcentaje: 22, medidas: { cintura: 65 }, fotos_urls: [], comentarios: "Cliente motivada.", estado: "valido" }
     ];
     await db.collection('seguimiento_fisico').insertMany(seguimientoData);
     console.log(`- ${seguimientoData.length} Registros de seguimiento insertados.`);
 
     // 5. Planes Nutricionales (Compatibles con el schema)
     const planesNutricionalesData = [
-        { 
-            contratoId: contratosIds[0], // Juan Pérez
-            nombre: 'Dieta de Fuerza y Volumen', descripcion: 'Alta en proteínas y carbohidratos.', 
-            comidas: [
-                { nombre: 'desayuno', descripcion: 'Arepa con huevo y queso', caloriasEstimadas: 600 },
-                { nombre: 'almuerzo', descripcion: 'Bandeja Paisa', caloriasEstimadas: 1200 },
-                { nombre: 'cena', descripcion: 'Pechuga de pollo con arroz', caloriasEstimadas: 700 }
-            ], 
-            fechaRegistro: HOY.subtract(20, 'days').toDate() 
-        },
-        { 
-            contratoId: contratosIds[8], // Andrés Castro (contrato renovado)
-            nombre: 'Dieta de Acondicionamiento', descripcion: 'Balanceada para resistencia.', 
-            comidas: [ { nombre: 'almuerzo', descripcion: 'Pasta integral con vegetales', caloriasEstimadas: 800 } ], 
-            fechaRegistro: HOY.subtract(30, 'days').toDate() 
-        }
+      {
+        contratoId: contratosIds[0], // Juan Pérez
+        nombre: 'Dieta de Fuerza y Volumen', descripcion: 'Alta en proteínas y carbohidratos.',
+        comidas: [
+          { nombre: 'desayuno', descripcion: 'Arepa con huevo y queso', caloriasEstimadas: 600 },
+          { nombre: 'almuerzo', descripcion: 'Bandeja Paisa', caloriasEstimadas: 1200 },
+          { nombre: 'cena', descripcion: 'Pechuga de pollo con arroz', caloriasEstimadas: 700 }
+        ],
+        fechaRegistro: HOY.subtract(20, 'days').toDate()
+      },
+      {
+        contratoId: contratosIds[8], // Andrés Castro (contrato renovado)
+        nombre: 'Dieta de Acondicionamiento', descripcion: 'Balanceada para resistencia.',
+        comidas: [{ nombre: 'almuerzo', descripcion: 'Pasta integral con vegetales', caloriasEstimadas: 800 }],
+        fechaRegistro: HOY.subtract(30, 'days').toDate()
+      }
     ];
     await db.collection('planes_nutricionales').insertMany(planesNutricionalesData);
     console.log(`- ${planesNutricionalesData.length} Planes nutricionales insertados.`);
@@ -165,7 +174,7 @@ async function seedDatabase() {
       { tipo: 'egreso', monto: 150000, descripcion: 'Compra de suplementos', fecha: HOY.subtract(10, 'days').toDate(), clienteId: null, contratoId: null },
       { tipo: 'ingreso', monto: 7000, descripcion: 'Venta de botella de agua', fecha: HOY.subtract(5, 'days').toDate(), clienteId: clientesIds[4], contratoId: null },
       { tipo: 'ingreso', monto: 25000, descripcion: 'Pase de un día', fecha: HOY.subtract(2, 'days').toDate(), clienteId: null, contratoId: null },
-      { tipo: 'egreso', monto: 240000, descripcion: 'Reembolso por cancelación - Fuerza y Potencia', fecha: HOY.subtract(4, 'months').toDate(), clienteId: clientesIds[4], contratoId: contratosIds[4]},
+      { tipo: 'egreso', monto: 240000, descripcion: 'Reembolso por cancelación - Fuerza y Potencia', fecha: HOY.subtract(4, 'months').toDate(), clienteId: clientesIds[4], contratoId: contratosIds[4] },
     ];
     await db.collection('transacciones_financieras').insertMany(transaccionesVariasData);
     console.log(`- ${transaccionesVariasData.length} Transacciones varias insertadas.`);

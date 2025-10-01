@@ -1,5 +1,16 @@
 import { ObjectId } from 'mongodb';
 
+export const entrenadorSchema = {
+  $jsonSchema: {
+    bsonType: "object",
+    title: "Esquema de Entrenador",
+    required: ["nombre"],
+    properties: {
+      nombre: { bsonType: "string", description: "Nombre completo del entrenador." }
+    }
+  }
+};
+
 export const clienteSchema = {
   $jsonSchema: {
     bsonType: "object",

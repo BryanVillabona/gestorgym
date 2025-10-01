@@ -133,6 +133,21 @@ const financieroMenu = async () => {
   return choice;
 };
 
+const entrenadorMenu = async () => {
+  const { action } = await inquirer.prompt({
+    type: 'list',
+    name: 'action',
+    message: 'Gestión de Entrenadores - ¿Qué deseas hacer?',
+    choices: [
+      { name: '1. Registrar nuevo entrenador', value: 'crearEntrenador' },
+      { name: '2. Listar todos los entrenadores', value: 'listarEntrenadores' },
+      new inquirer.Separator(),
+      { name: 'Volver al menú principal', value: 'back' },
+    ],
+  });
+  return action;
+};
+
 // Menú principal
 const mainMenu = async () => {
   console.clear();
@@ -149,6 +164,7 @@ const mainMenu = async () => {
         { name: '4. Nutrición', value: 'nutricion' },
         { name: '5. Contratos', value: 'contratos' },
         { name: '6. Finanzas', value: 'financiero' },
+        { name: '7. Gestión de Entrenadores', value: 'entrenadores' },
         new inquirer.Separator(),
         { name: 'Salir', value: 'exit' },
       ],
@@ -189,6 +205,8 @@ const run = async () => {
       case 'financiero':
         subMenuChoice = await financieroMenu();
         break;
+      case 'entrenadores':
+      subMenuChoice = await entrenadorMenu();
       default:
         log(error('Opción no implementada todavía.'));
         await inquirer.prompt({ type: 'input', name: 'continue', message: 'Presiona Enter para continuar...' });
