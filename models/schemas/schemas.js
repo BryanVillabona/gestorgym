@@ -49,6 +49,10 @@ export const contratoSchema = {
     properties: {
       clienteId: { bsonType: "objectId", description: "Referencia al cliente." },
       planId: { bsonType: "objectId", description: "Referencia al plan de entrenamiento." },
+      entrenadorId: { 
+        bsonType: ["objectId", "null"], 
+        description: "Referencia al entrenador asignado." 
+      },
       fechaInicio: { bsonType: "date", description: "Fecha de inicio del contrato." },
       fechaFin: { bsonType: "date", description: "Fecha de finalización del contrato." },
       precio: { bsonType: ["double", "int"], minimum: 0, description: "Precio del contrato." },

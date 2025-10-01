@@ -207,6 +207,7 @@ const run = async () => {
         break;
       case 'entrenadores':
       subMenuChoice = await entrenadorMenu();
+        break;
       default:
         log(error('Opción no implementada todavía.'));
         await inquirer.prompt({ type: 'input', name: 'continue', message: 'Presiona Enter para continuar...' });

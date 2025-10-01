@@ -3,6 +3,7 @@ import inquirer from 'inquirer';
 import Command from './Command.js';
 import { success, log, error, info } from '../utils/logger.js';
 import database from '../config/mongodb.js';
+import EntrenadorRepository from '../repositories/EntrenadorRepository.js';
 
 // Importación de repositorios
 import ClienteRepository from '../repositories/ClienteRepository.js';
@@ -27,6 +28,7 @@ export default class AsociarPlanCommand extends Command {
     this.contratoRepo = new ContratoRepository();
     this.transaccionRepo = new TransaccionRepository();
     this.planNutricionalRepo = new PlanNutricionalRepository();
+    this.entrenadorRepo = new EntrenadorRepository();
   }
   
   // Ejecución del comando
@@ -72,7 +74,6 @@ export default class AsociarPlanCommand extends Command {
         default: false
     });
 
-    // --- NUEVA LÓGICA PARA CREAR PLAN NUTRICIONAL ---
     let datosPlanNutricional = null;
     let comidas = [];
 
@@ -123,7 +124,18 @@ export default class AsociarPlanCommand extends Command {
             log(success(`› ${tipoComida.charAt(0).toUpperCase() + tipoComida.slice(1)} añadido al plan.`));
         }
     }
-    // --- FIN DE LA NUEVA LÓGICA ---
+
+    log(info('\nAsignar Entrenador (Opcional)'));
+    const entrenadores = await this.entrenadorRepo.findAll();
+    const choicesEntrenadores = [
+        { name: 'No asignar entrenador ahora', value: null },
+        new inquirer.Separator(),
+        ...entrenadores.map(e => ({ name: e.nombre, value: e._id }))
+    ];
+    const { entrenadorId } = await inquirer.prompt({
+        type: 'list', name: 'entrenadorId', message: '¿Asignar un entrenador a este contrato?',
+        choices: choicesEntrenadores
+    });
 
     // Iniciar sesión para transacción
     const mongoClient = database.getMongoClient();
@@ -140,7 +152,8 @@ export default class AsociarPlanCommand extends Command {
         // Se arma el objeto del contrato
         const contratoData = createContrato({
           clienteId, planId: planSeleccionado._id, precio: precioFinal,
-          duracion_dias: planSeleccionado.duracion_dias
+          duracion_dias: planSeleccionado.duracion_dias,
+          entrenadorId: entrenadorId
         });
 
         // Se crea el contrato en la base de datos
