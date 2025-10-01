@@ -9,6 +9,8 @@ import ContratoRepository from '../repositories/ContratoRepository.js';
 import TransaccionRepository from '../repositories/TransaccionRepository.js';
 import PlanNutricionalRepository from '../repositories/PlanNutricionalRepository.js';
 
+import EntrenadorRepository from '../repositories/EntrenadorRepository.js';
+
 import { createCliente } from '../models/Cliente.js';
 import { createContrato } from '../models/Contrato.js';
 import { createTransaccion } from '../models/TransaccionFinanciera.js';
@@ -22,6 +24,7 @@ export default class CrearClienteCommand extends Command {
     this.contratoRepo = new ContratoRepository();
     this.transaccionRepo = new TransaccionRepository();
     this.planNutricionalRepo = new PlanNutricionalRepository();
+    this.entrenadorRepo = new EntrenadorRepository();
   }
 
   async execute() {

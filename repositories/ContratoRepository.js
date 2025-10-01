@@ -32,8 +32,17 @@ export default class ContratoRepository {
     return await collection.aggregate([
       { $lookup: { from: 'clientes', localField: 'clienteId', foreignField: '_id', as: 'clienteInfo' } },
       { $lookup: { from: 'planes_entrenamiento', localField: 'planId', foreignField: '_id', as: 'planInfo' } },
+      {
+        $lookup: {
+          from: 'entrenadores',
+          localField: 'entrenadorId',
+          foreignField: '_id',
+          as: 'entrenadorInfo'
+        }
+      },
       { $unwind: '$clienteInfo' },
       { $unwind: '$planInfo' },
+      { $unwind: { path: "$entrenadorInfo", preserveNullAndEmptyArrays: true } },
       { $sort: { fechaInicio: -1 } }
     ]).toArray();
   }

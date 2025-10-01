@@ -4,6 +4,7 @@ import { success, log, error, info } from '../utils/logger.js';
 import database from '../config/mongodb.js';
 import ContratoRepository from '../repositories/ContratoRepository.js';
 import TransaccionRepository from '../repositories/TransaccionRepository.js';
+import EntrenadorRepository from '../repositories/EntrenadorRepository.js'; 
 import { createContrato } from '../models/Contrato.js';
 import { createTransaccion } from '../models/TransaccionFinanciera.js';
 
@@ -12,6 +13,7 @@ export default class RenovarContratoCommand extends Command {
     super();
     this.contratoRepo = new ContratoRepository();
     this.transaccionRepo = new TransaccionRepository();
+    this.entrenadorRepo = new EntrenadorRepository();
   }
 
   async execute() {
@@ -43,6 +45,18 @@ export default class RenovarContratoCommand extends Command {
           validate: (v) => !isNaN(parseFloat(v)) && parseFloat(v) >= 0 ? true : 'Introduce un precio válido.',
       });
 
+      log(info('\nAsignar Entrenador (Opcional)'));
+      const entrenadores = await this.entrenadorRepo.findAll();
+      const choicesEntrenadores = [
+          { name: 'No asignar entrenador ahora', value: null },
+          new inquirer.Separator(),
+          ...entrenadores.map(e => ({ name: e.nombre, value: e._id }))
+      ];
+      const { entrenadorId } = await inquirer.prompt({
+          type: 'list', name: 'entrenadorId', message: '¿Asignar un entrenador a este nuevo contrato?',
+          choices: choicesEntrenadores
+      });
+
       // 3. Iniciar la transacción
       const mongoClient = database.getMongoClient();
       const session = mongoClient.startSession();
@@ -59,7 +73,8 @@ export default class RenovarContratoCommand extends Command {
             planId: contratoAnterior.planId,
             precio: precioFinal,
             duracion_dias: contratoAnterior.planInfo.duracion_dias,
-            renuevaContratoId: contratoAnterior._id // Enlazamos al contrato viejo
+            renuevaContratoId: contratoAnterior._id,
+            entrenadorId: entrenadorId 
           });
           const contratoResult = await this.contratoRepo.create(nuevoContratoData, { session });
           nuevoContratoId = contratoResult.insertedId;

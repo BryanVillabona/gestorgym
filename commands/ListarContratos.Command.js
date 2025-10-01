@@ -60,7 +60,7 @@ export default class ListarContratosCommand extends Command {
 
       log(`\n${titulo}`);
       const table = new Table({
-        head: ['Cliente', 'Plan', 'F. Inicio', 'F. Fin', 'Precio', 'Estado']
+        head: ['Cliente', 'Plan', 'Entrenador', 'F. Inicio', 'F. Fin', 'Precio', 'Estado']
       });
 
       contratos.forEach(contrato => {
@@ -82,6 +82,7 @@ export default class ListarContratosCommand extends Command {
         table.push([
           contrato.nombreCliente,
           contrato.planInfo.nombre,
+          contrato.entrenadorInfo ? contrato.entrenadorInfo.nombre : 'N/A',
           dayjs(contrato.fechaInicio).format('YYYY-MM-DD'),
           dayjs(contrato.fechaFin).format('YYYY-MM-DD'),
           `$${contrato.precio.toLocaleString('es-CO')}`,
